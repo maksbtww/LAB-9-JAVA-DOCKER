@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Список сайтов</title>
+</head>
+<body>
+<h1>Сайты</h1>
+<input type="text" id="newSite" placeholder="Введите сайт">
+<button onclick="addWebsite()">Добавить</button>
+
+<ul id="list"></ul>
+
+<script>
+    async function loadWebsites() {
+        const response = await fetch('/api/websites');
+        const websites = await response.json();
+        document.getElementById('list').innerHTML = websites.map((w, i) =>
+            `<li>${w} <button onclick="deleteWebsite(${i})">Удалить</button></li>`
+        ).join('');
+    }
+
+    async function addWebsite() {
+        const site = document.getElementById('newSite').value;
+        await fetch('/api/websites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(site)
+        });
+        loadWebsites();
+    }
+
+    async function deleteWebsite(index) {
+        await fetch('/api/websites/' + index, { method: 'DELETE' });
+        loadWebsites();
+    }
+
+    window.onload = loadWebsites;
+</script>
+</body>
+</html>
